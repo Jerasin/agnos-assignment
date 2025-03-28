@@ -1,0 +1,21 @@
+FROM golang:1.21.6 
+
+WORKDIR /app 
+
+
+COPY . .
+
+ENV APP_ENV development
+
+RUN go mod download 
+RUN go install github.com/codegangsta/gin@latest
+RUN go install github.com/google/wire/cmd/wire@latest
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.4
+RUN mkdir -p ./docs
+RUN wire gen ./app/module
+
+RUN swag init --parseDependency --parseInternal -g ./main.go -o ./docs
+
+EXPOSE 3000 
+
+CMD ["gin","-a","3001","-p","3000","--buildArgs","-buildvcs=false","run","main.go"]

@@ -1,0 +1,7 @@
+*.exe
+db-data
+
+go-bin
+gin-bin
+
+deploy.sh
