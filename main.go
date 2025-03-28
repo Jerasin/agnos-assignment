@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"os"
-
 	"agnos-assignment/app/config"
 	"agnos-assignment/app/router"
+	"agnos-assignment/app/utils"
 	docs "agnos-assignment/docs"
+	"os"
 
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -43,8 +43,8 @@ func main() {
 	app.GET(swaggerUiPath, ginSwagger.WrapHandler(swaggerfiles.Handler))
 	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
 
-	// db := util.InitDbClient()
-	// initDataClient := util.InitDataClientInit(db)
+	utils.InitDbClient()
+	// initDataClient := utils.InitDataClientInit(db)
 
 	for _, item := range app.Routes() {
 		println("method:", item.Method, "path:", item.Path)
