@@ -1,0 +1,14 @@
+[
+  {
+    "name_en": "rajavithi",
+    "name_th": "โรงพยาบาลราชวิถี",
+    "phone_number": "123456789",
+    "address": "address"
+  },
+  {
+    "name_en": "praram9",
+    "name_th": "โรงพยาบาลพระราม 9",
+    "phone_number": "123456889",
+    "address": "address"
+  }
+]

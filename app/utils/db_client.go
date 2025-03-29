@@ -12,7 +12,7 @@ import (
 
 func autoMigrate(db *gorm.DB) {
 	fmt.Println("autoMigrate")
-	db.AutoMigrate(&model.Patient{})
+	db.AutoMigrate(&model.Hospital{}, &model.Patient{}, &model.Staff{})
 }
 
 func InitDbClient() *gorm.DB {

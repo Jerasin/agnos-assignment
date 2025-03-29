@@ -3,6 +3,7 @@ package constant
 type ResponseStatus int
 type Headers int
 type General int
+type Gender string
 
 // Constant Api
 const (
@@ -26,3 +27,8 @@ func (r ResponseStatus) GetResponseStatus() string {
 func (r ResponseStatus) GetResponseMessage() string {
 	return [...]string{"Success", "Data Not Found", "Unknown Error", "Invalid Request", "Unauthorized", "Duplicated", "ValidateError", "BadRequest", "RequiredQuery", "DataIsExit"}[r-1]
 }
+
+const (
+	Male   Gender = "M"
+	Female Gender = "F"
+)

@@ -15,7 +15,422 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {},
+    "paths": {
+        "/hospital": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Search Hospital",
+                "tags": [
+                    "Hospital"
+                ],
+                "summary": "Get List Hospital",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.HospitalModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/patient/search": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Search Detail Patient",
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Search Detail Patient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "national_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "passport_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "first_name_en",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "first_name_th",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "middle_name_en",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "middle_name_th",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "last_name_en",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "last_name_th",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "date_of_birth",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "phone_number",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "email",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.PatientSearchModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/patient/search/{ID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Search Patient",
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Search Patient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.PatientSearchModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create Staff",
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Create Staff",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.StaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.CreateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff/login": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Login Staff",
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Login Staff",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.StaffLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.LoginStaffModel"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "request.StaffLoginRequest": {
+            "type": "object",
+            "required": [
+                "hospital",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "hospital": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "test"
+                }
+            }
+        },
+        "request.StaffRequest": {
+            "type": "object",
+            "required": [
+                "age",
+                "email",
+                "first_name_en",
+                "first_name_th",
+                "gender",
+                "hospital",
+                "last_name_en",
+                "last_name_th",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "email": {
+                    "type": "string",
+                    "example": "admin@gmail.com"
+                },
+                "first_name_en": {
+                    "type": "string",
+                    "example": "test"
+                },
+                "first_name_th": {
+                    "type": "string",
+                    "example": "ทดสอบ"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "M"
+                },
+                "hospital": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "last_name_en": {
+                    "type": "string",
+                    "example": "tester"
+                },
+                "last_name_th": {
+                    "type": "string",
+                    "example": "นามสกุล ทดสอบ"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "1234"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "test"
+                }
+            }
+        },
+        "response.CreateDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "create success"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.HospitalModel": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name_en": {
+                    "type": "string"
+                },
+                "name_th": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.LoginStaffModel": {
+            "type": "object",
+            "required": [
+                "refresh_token",
+                "token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "admin"
+                },
+                "token": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "1234"
+                }
+            }
+        },
+        "response.PatientSearchModel": {
+            "type": "object",
+            "properties": {
+                "date_of_birth": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name_en": {
+                    "type": "string"
+                },
+                "first_name_th": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "last_name_en": {
+                    "type": "string"
+                },
+                "last_name_th": {
+                    "type": "string"
+                },
+                "middle_name_en": {
+                    "type": "string"
+                },
+                "middle_name_th": {
+                    "type": "string"
+                },
+                "national_id": {
+                    "type": "string"
+                },
+                "passport_id": {
+                    "type": "string"
+                },
+                "patient_hn": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "Bearer": {
             "description": "Type \"Bearer\" followed by a space and JWT token.",

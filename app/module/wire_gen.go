@@ -8,17 +8,72 @@ package module
 
 import (
 	"agnos-assignment/app/controller"
+	"agnos-assignment/app/repository"
 	"agnos-assignment/app/service"
+	"agnos-assignment/app/utils"
 	"github.com/google/wire"
 )
+
+// Injectors from hospital_injector.go:
+
+func HospitalModuleInit() *HospitalModule {
+	gormDB := utils.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	hospitalRepository := repository.HospitalRepositoryInit(baseRepository)
+	hospitalService := service.HospitalServiceInit(hospitalRepository)
+	hospitalContoller := controller.HospitalContollerInit(hospitalService)
+	hospitalModule := NewHospitalModule(hospitalRepository, hospitalContoller, hospitalService)
+	return hospitalModule
+}
 
 // Injectors from patient_injector.go:
 
 func PatientModuleInit() *PatientModule {
-	patientService := service.PatientServiceInit()
+	gormDB := utils.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	patientRepository := repository.PatientRepositoryInit(baseRepository)
+	patientService := service.PatientServiceInit(patientRepository)
 	patientContoller := controller.PatientContollerInit(patientService)
-	patientModule := NewPatientModule(patientContoller, patientService)
+	patientModule := NewPatientModule(patientRepository, patientContoller, patientService)
 	return patientModule
+}
+
+// Injectors from staff_injector.go:
+
+func StaffModuleInit() *StaffModule {
+	gormDB := utils.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	staffRepository := repository.StaffRepositoryInit(baseRepository)
+	staffService := service.StaffServiceInit(staffRepository)
+	staffContoller := controller.StaffContollerInit(staffService)
+	staffModule := NewStaffModule(staffRepository, staffContoller, staffService)
+	return staffModule
+}
+
+// hospital_injector.go:
+
+var hospitalCtrlSet = wire.NewSet(controller.HospitalContollerInit, wire.Bind(new(controller.HospitalContollerInterface), new(*controller.HospitalContoller)))
+
+var hospitalSvcSet = wire.NewSet(service.HospitalServiceInit, wire.Bind(new(service.HospitalServiceInterface), new(*service.HospitalService)))
+
+var hospitalRepoSet = wire.NewSet(repository.HospitalRepositoryInit, wire.Bind(new(repository.HospitalRepositoryInterface), new(*repository.HospitalRepository)))
+
+type HospitalModule struct {
+	HospitalRepo repository.HospitalRepositoryInterface
+	HospitalCtrl controller.HospitalContollerInterface
+	HospitalSvc  service.HospitalServiceInterface
+}
+
+func NewHospitalModule(
+	hospitalRepo repository.HospitalRepositoryInterface,
+	hospitalCtrl controller.HospitalContollerInterface,
+	hospitalSvc service.HospitalServiceInterface,
+) *HospitalModule {
+	return &HospitalModule{
+		HospitalRepo: hospitalRepo,
+		HospitalCtrl: hospitalCtrl,
+		HospitalSvc:  hospitalSvc,
+	}
 }
 
 // patient_injector.go:
@@ -27,17 +82,48 @@ var patientCtrlSet = wire.NewSet(controller.PatientContollerInit, wire.Bind(new(
 
 var patientSvcSet = wire.NewSet(service.PatientServiceInit, wire.Bind(new(service.PatientServiceInterface), new(*service.PatientService)))
 
+var patientRepoSet = wire.NewSet(repository.PatientRepositoryInit, wire.Bind(new(repository.PatientRepositoryInterface), new(*repository.PatientRepository)))
+
 type PatientModule struct {
+	PatientRepo repository.PatientRepositoryInterface
 	PatientCtrl controller.PatientContollerInterface
 	PatientSvc  service.PatientServiceInterface
 }
 
 func NewPatientModule(
+	patientRepo repository.PatientRepositoryInterface,
 	patientCtrl controller.PatientContollerInterface,
 	patientSvc service.PatientServiceInterface,
 ) *PatientModule {
 	return &PatientModule{
+		PatientRepo: patientRepo,
 		PatientCtrl: patientCtrl,
 		PatientSvc:  patientSvc,
+	}
+}
+
+// staff_injector.go:
+
+var staffCtrlSet = wire.NewSet(controller.StaffContollerInit, wire.Bind(new(controller.StaffContollerInterface), new(*controller.StaffContoller)))
+
+var staffSvcSet = wire.NewSet(service.StaffServiceInit, wire.Bind(new(service.StaffServiceInterface), new(*service.StaffService)))
+
+var staffRepoSet = wire.NewSet(repository.StaffRepositoryInit, wire.Bind(new(repository.StaffRepositoryInterface), new(*repository.StaffRepository)))
+
+type StaffModule struct {
+	StaffRepo repository.StaffRepositoryInterface
+	StaffCtrl controller.StaffContollerInterface
+	StaffSvc  service.StaffServiceInterface
+}
+
+func NewStaffModule(
+	staffRepo repository.StaffRepositoryInterface,
+	staffCtrl controller.StaffContollerInterface,
+	staffSvc service.StaffServiceInterface,
+) *StaffModule {
+	return &StaffModule{
+		StaffRepo: staffRepo,
+		StaffCtrl: staffCtrl,
+		StaffSvc:  staffSvc,
 	}
 }

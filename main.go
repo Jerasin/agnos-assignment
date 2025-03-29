@@ -43,8 +43,10 @@ func main() {
 	app.GET(swaggerUiPath, ginSwagger.WrapHandler(swaggerfiles.Handler))
 	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
 
-	utils.InitDbClient()
-	// initDataClient := utils.InitDataClientInit(db)
+	db := utils.InitDbClient()
+	initDataClient := utils.InitDataClientInit(db)
+	initDataClient.InitHospital()
+	initDataClient.InitPatient()
 
 	for _, item := range app.Routes() {
 		println("method:", item.Method, "path:", item.Path)
