@@ -23,11 +23,13 @@ type StaffServiceInterface interface {
 
 type StaffService struct {
 	StaffRepository repository.StaffRepositoryInterface
+	JWTService      pkg.JWTServiceInterface
 }
 
-func StaffServiceInit(StaffRepository repository.StaffRepositoryInterface) *StaffService {
+func StaffServiceInit(staffRepository repository.StaffRepositoryInterface, jwtService pkg.JWTServiceInterface) *StaffService {
 	return &StaffService{
-		StaffRepository: StaffRepository,
+		StaffRepository: staffRepository,
+		JWTService:      jwtService,
 	}
 }
 
@@ -111,13 +113,11 @@ func (s StaffService) LoginStaff(c *gin.Context) {
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	jwt := pkg.NewAuthService()
-
-	token := jwt.GenerateToken(staff.Username, staff.HospitalID)
+	token := s.JWTService.GenerateToken(staff.Username, staff.HospitalID)
 
 	response := response.LoginStaffModel{
 		Token:        token,
-		RefreshToken: jwt.GenerateRefreshToken(staff.Username),
+		RefreshToken: s.JWTService.GenerateRefreshToken(staff.Username),
 	}
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, response))

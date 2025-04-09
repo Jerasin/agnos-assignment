@@ -8,6 +8,7 @@ package module
 
 import (
 	"agnos-assignment/app/controller"
+	"agnos-assignment/app/pkg"
 	"agnos-assignment/app/repository"
 	"agnos-assignment/app/service"
 	"agnos-assignment/app/utils"
@@ -44,7 +45,8 @@ func StaffModuleInit() *StaffModule {
 	gormDB := utils.InitDbClient()
 	baseRepository := repository.BaseRepositoryInit(gormDB)
 	staffRepository := repository.StaffRepositoryInit(baseRepository)
-	staffService := service.StaffServiceInit(staffRepository)
+	jwtServiceInterface := pkg.JWTServiceInit()
+	staffService := service.StaffServiceInit(staffRepository, jwtServiceInterface)
 	staffContoller := controller.StaffContollerInit(staffService)
 	staffModule := NewStaffModule(staffRepository, staffContoller, staffService)
 	return staffModule

@@ -51,56 +51,37 @@ func (s PatientService) SearchDetail(c *gin.Context, query *request.PatientReque
 	defer pkg.PanicHandler(c)
 
 	var patient model.Patient
-	payload := pkg.NewAuthService().GetPayloadInToken(c)
 
-	fmt.Println("payload", payload["hospital_id"])
+	// jwtService := c.MustGet("JWTService").(pkg.JWTServiceInterface)
+	// payload := jwtService.GetPayloadInToken(c)
+	// fmt.Println("payload", payload)
 
-	db := s.PatientRepository.GetBaseRepo().ClientDb().Where("hospital_id = ?", payload["hospital_id"])
+	userContext := c.MustGet("UserContext").(pkg.UserContext)
+	fmt.Println("userContext", userContext)
 
-	if query.FirstNameTh != "" {
-		db.Where("first_name_th = ?", query.FirstNameTh)
+	db := s.PatientRepository.GetBaseRepo().ClientDb()
+
+	db = db.Where("hospital_id = ?", userContext.HospitalID)
+
+	conditions := map[string]string{
+		"first_name_th":  query.FirstNameTh,
+		"middle_name_th": query.MiddleNameTh,
+		"last_name_th":   query.LastNameTh,
+		"first_name_en":  query.FirstNameEn,
+		"middle_name_en": query.MiddleNameEn,
+		"last_name_en":   query.LastNameEn,
+		"national_id":    query.NationalId,
+		"passport_id":    query.PassportId,
+		"phone_number":   query.PhoneNumber,
+		"email":          query.Email,
+		"date_of_birth":  query.DateOfBirth,
 	}
 
-	if query.MiddleNameTh != "" {
-		db.Where("middle_name_th = ?", query.MiddleNameTh)
+	for field, value := range conditions {
+		if value != "" {
+			db = db.Where(fmt.Sprintf("%s = ?", field), value)
+		}
 	}
-
-	if query.LastNameTh != "" {
-		db.Where("last_name_th = ?", query.LastNameTh)
-	}
-
-	if query.FirstNameEn != "" {
-		db.Where("first_name_en = ?", query.FirstNameEn)
-	}
-
-	if query.MiddleNameEn != "" {
-		db.Where("middle_name_en = ?", query.MiddleNameEn)
-	}
-
-	if query.LastNameEn != "" {
-		db.Where("last_name_en = ?", query.LastNameEn)
-	}
-
-	if query.NationalId != "" {
-		db.Where("national_id = ?", query.NationalId)
-	}
-
-	if query.PassportId != "" {
-		db.Where("passport_id = ?", query.PassportId)
-	}
-
-	if query.PhoneNumber != "" {
-		db.Where("phone_number = ?", query.PhoneNumber)
-	}
-
-	if query.Email != "" {
-		db.Where("email = ?", query.Email)
-	}
-
-	if query.DateOfBirth != "" {
-		db.Where("date_of_birth = ?", query.DateOfBirth)
-	}
-
 	err := db.First(&patient).Error
 
 	if err != nil {
@@ -110,6 +91,8 @@ func (s PatientService) SearchDetail(c *gin.Context, query *request.PatientReque
 
 	var res response.PatientSearchModel
 	pkg.ModelDump(&res, patient)
+
+	fmt.Println("res", res)
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, res))
 }

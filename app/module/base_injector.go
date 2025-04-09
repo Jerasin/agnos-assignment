@@ -6,6 +6,7 @@
 package module
 
 import (
+	"agnos-assignment/app/pkg"
 	"agnos-assignment/app/repository"
 	"agnos-assignment/app/utils"
 
@@ -17,3 +18,5 @@ var db = wire.NewSet(utils.InitDbClient)
 var baseRepoSet = wire.NewSet(repository.BaseRepositoryInit,
 	wire.Bind(new(repository.BaseRepositoryInterface), new(*repository.BaseRepository)),
 )
+
+var JWTSvcSet = wire.NewSet(pkg.JWTServiceInit)

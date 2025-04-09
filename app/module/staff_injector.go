@@ -44,6 +44,6 @@ func NewStaffModule(
 }
 
 func StaffModuleInit() *StaffModule {
-	wire.Build(NewStaffModule, staffCtrlSet, staffSvcSet, staffRepoSet, db, baseRepoSet)
+	wire.Build(NewStaffModule, staffCtrlSet, staffSvcSet, staffRepoSet, db, baseRepoSet, JWTSvcSet)
 	return nil
 }

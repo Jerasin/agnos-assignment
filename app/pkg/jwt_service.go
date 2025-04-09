@@ -13,14 +13,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type JWTService interface {
+type UserContext struct {
+	Username   string
+	HospitalID uint
+}
+
+type JWTServiceInterface interface {
 	GenerateToken(username string, hospitalID uint) string
 	ValidateToken(token string) (*jwt.Token, error)
 	GenerateRefreshToken(username string) string
-	GetPayloadInToken(c *gin.Context) jwt.MapClaims
+	GetPayloadInToken(c *gin.Context) *UserContext
 }
 
-type jwtServices struct {
+type JWTService struct {
 	secretKey string
 	issure    string
 }
@@ -39,14 +44,14 @@ func getSecretKey() string {
 	return secret
 }
 
-func NewAuthService() JWTService {
-	return &jwtServices{
+func JWTServiceInit() JWTServiceInterface {
+	return &JWTService{
 		secretKey: getSecretKey(),
 		issure:    "Bikash",
 	}
 }
 
-func (service *jwtServices) GenerateRefreshToken(username string) string {
+func (service *JWTService) GenerateRefreshToken(username string) string {
 	config.EnvConfig()
 	JWT_EXPIRE_MINUTE := config.GetEnv("JWT_EXPIRE_MINUTE", "15")
 
@@ -69,7 +74,7 @@ func (service *jwtServices) GenerateRefreshToken(username string) string {
 	return rt
 }
 
-func (service *jwtServices) GenerateToken(username string, hospitalID uint) string {
+func (service *JWTService) GenerateToken(username string, hospitalID uint) string {
 	config.EnvConfig()
 	JWT_EXPIRE_MINUTE := config.GetEnv("JWT_EXPIRE_MINUTE", "15")
 
@@ -99,8 +104,8 @@ func (service *jwtServices) GenerateToken(username string, hospitalID uint) stri
 	return t
 }
 
-func (service *jwtServices) ValidateToken(encodedToken string) (*jwt.Token, error) {
-	return jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
+func (service *JWTService) ValidateToken(token string) (*jwt.Token, error) {
+	return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, isValid := token.Method.(*jwt.SigningMethodHMAC); !isValid {
 			return nil, fmt.Errorf("invalid token = %s", token.Header["alg"])
 
@@ -110,7 +115,7 @@ func (service *jwtServices) ValidateToken(encodedToken string) (*jwt.Token, erro
 
 }
 
-func (service *jwtServices) GetPayloadInToken(c *gin.Context) jwt.MapClaims {
+func (service *JWTService) GetPayloadInToken(c *gin.Context) *UserContext {
 	defer PanicHandler(c)
 
 	var claims jwt.MapClaims
@@ -134,5 +139,23 @@ func (service *jwtServices) GetPayloadInToken(c *gin.Context) jwt.MapClaims {
 		PanicException(constant.Unauthorized)
 	}
 
-	return claims
+	return mapUserContext(claims)
+}
+
+func mapUserContext(payload jwt.MapClaims) *UserContext {
+	username, ok := payload["username"].(string)
+
+	if !ok {
+		PanicException(constant.BadRequest)
+	}
+
+	hospitalID, ok := payload["hospital_id"].(float64)
+	if !ok {
+		PanicException(constant.BadRequest)
+	}
+
+	return &UserContext{
+		Username:   username,
+		HospitalID: uint(hospitalID),
+	}
 }

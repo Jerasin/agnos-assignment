@@ -22,11 +22,19 @@ func AuthorizeJwt() gin.HandlerFunc {
 		}
 
 		tokenString := authHeader[len(BEARER_SCHEMA):]
-		token, err := pkg.NewAuthService().ValidateToken(tokenString)
+		token, err := pkg.JWTServiceInit().ValidateToken(tokenString)
 
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
-			fmt.Println("claims", claims)
+
+			c.Set("JWTService", pkg.JWTServiceInit())
+			c.Set("JWTClaims", claims)
+
+			jwtSvc := pkg.JWTServiceInit()
+			payload := jwtSvc.GetPayloadInToken(c)
+
+			c.Set("UserContext", *payload)
+
 		} else {
 			fmt.Println("testing")
 			fmt.Println(err)
