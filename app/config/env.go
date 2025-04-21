@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 func loadConfig() {
@@ -22,7 +23,7 @@ func loadConfig() {
 		envFile = ".env"
 	}
 
-	fmt.Printf("Loading config file %s\n", envFile)
+	logrus.Infof("Loading config file %s\n", envFile)
 
 	err := godotenv.Load(envFile)
 	if err != nil {

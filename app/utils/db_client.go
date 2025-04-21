@@ -5,6 +5,7 @@ import (
 	"agnos-assignment/app/model"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -24,13 +25,7 @@ func InitDbClient() *gorm.DB {
 	APP_ENV := config.GetEnv("APP_ENV", "development")
 
 	connectionInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable", DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
-	_, err := fmt.Printf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable", DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
-	// fmt.Println("n", n)
-	// fmt.Println("err", err)
-
-	if err != nil {
-		panic("failed to mapping string")
-	}
+	logrus.Infof("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable", DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
 
 	dbLogLevel := logger.Info
 

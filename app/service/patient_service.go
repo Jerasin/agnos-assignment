@@ -18,19 +18,29 @@ import (
 type PatientServiceInterface interface {
 	Search(c *gin.Context)
 	SearchDetail(c *gin.Context, query *request.PatientRequestModel)
+	GetList(c *gin.Context)
 }
 
 type PatientService struct {
+	BaseSvc           BaseServiceInterface
 	PatientRepository repository.PatientRepositoryInterface
 }
 
-func PatientServiceInit(patientRepository repository.PatientRepositoryInterface) *PatientService {
+func PatientServiceInit(baseSvc BaseServiceInterface, patientRepository repository.PatientRepositoryInterface) *PatientService {
 	return &PatientService{
+		BaseSvc:           baseSvc,
 		PatientRepository: patientRepository,
 	}
 }
 
-func (s PatientService) Search(c *gin.Context) {
+func (s *PatientService) GetList(c *gin.Context) {
+	hospitals := []model.Patient{}
+	hospital := model.Patient{}
+	res := []response.PatientSearchModel{}
+	s.BaseSvc.Pagination(c, hospital, hospitals, res)
+}
+
+func (s *PatientService) Search(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 	ID := c.Param("ID")
 
@@ -47,7 +57,7 @@ func (s PatientService) Search(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, res))
 }
 
-func (s PatientService) SearchDetail(c *gin.Context, query *request.PatientRequestModel) {
+func (s *PatientService) SearchDetail(c *gin.Context, query *request.PatientRequestModel) {
 	defer pkg.PanicHandler(c)
 
 	var patient model.Patient

@@ -3,45 +3,32 @@ package controller
 import (
 	"agnos-assignment/app/constant"
 	"agnos-assignment/app/pkg"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
-type BasePaginationModel struct {
-	page      int
-	pageSize  int
-	search    string
-	sortField string
-	sortValue string
+type BaseControllerInterface interface {
+	PaginationRoot(c *gin.Context)
 }
 
-func CreatePagination(c *gin.Context) *BasePaginationModel {
-	reqPage := c.DefaultQuery("page", "1")
-	reqPageSize := c.DefaultQuery("pageSize", "15")
-	search := c.DefaultQuery("search", "")
-	sortField := c.DefaultQuery("sortField", "updated_at")
-	sortValue := c.DefaultQuery("sortValue", "desc")
+type BaseController[T any] struct {
+	Svc T
+}
 
-	page, err := strconv.Atoi(reqPage)
-
-	if err != nil {
-		log.Error("PaginationModel Convert Data Error: ", err)
-		pkg.PanicException(constant.ValidateError)
+func BaseControllerInit[T any](svc T) *BaseController[T] {
+	return &BaseController[T]{
+		Svc: svc,
 	}
+}
 
-	pageSize, err := strconv.Atoi(reqPageSize)
-	if err != nil {
-		log.Error("PaginationModel Convert Data Error: ", err)
-		pkg.PanicException(constant.ValidateError)
-	}
+func (b *BaseController[T]) BasePagination(c *gin.Context) {
+	defer pkg.PanicHandler(c)
 
-	return &BasePaginationModel{
-		page:      page,
-		pageSize:  pageSize,
-		search:    search,
-		sortField: sortField,
-		sortValue: sortValue,
+	if svc, ok := any(b.Svc).(interface {
+		GetList(c *gin.Context)
+	}); ok {
+		svc.GetList(c)
+	} else {
+		pkg.PanicException(constant.MethodNotFound)
 	}
 }

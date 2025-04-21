@@ -15,21 +15,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PanicDatabaseException(err error, c *gin.Context) {
+func PanicDatabaseException(err error, c *gin.Context, skipError error) {
 	if err != nil {
 		switch {
-		case errors.Is(err, gorm.ErrDuplicatedKey):
+		case errors.Is(err, gorm.ErrDuplicatedKey) && !errors.Is(err, skipError):
 			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "username or password is exits"))
 			return
-		case errors.Is(err, gorm.ErrInvalidDB):
+		case errors.Is(err, gorm.ErrInvalidDB) && !errors.Is(err, skipError):
 			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "invalid database"))
 			return
-		case errors.Is(err, gorm.ErrInvalidValue):
+		case errors.Is(err, gorm.ErrInvalidValue) && !errors.Is(err, skipError):
 			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "invalid value"))
 			return
+		case errors.Is(err, gorm.ErrRecordNotFound) && !errors.Is(err, skipError):
+			c.JSON(http.StatusNotFound, BuildResponse(constant.DataNotFound, "record not found"))
+			return
 		default:
-			log.Error("Happened error when saving data to database. Error", err)
-			PanicException(constant.UnknownError)
+			if !errors.Is(err, skipError) {
+				log.Error("Happened error when saving data to database. Error", err)
+				PanicException(constant.UnknownError)
+			}
+
 			return
 		}
 	}

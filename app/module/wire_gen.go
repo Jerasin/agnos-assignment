@@ -21,7 +21,8 @@ func HospitalModuleInit() *HospitalModule {
 	gormDB := utils.InitDbClient()
 	baseRepository := repository.BaseRepositoryInit(gormDB)
 	hospitalRepository := repository.HospitalRepositoryInit(baseRepository)
-	hospitalService := service.HospitalServiceInit(hospitalRepository)
+	baseService := service.BaseServiceInit(baseRepository)
+	hospitalService := service.HospitalServiceInit(baseService, hospitalRepository)
 	hospitalContoller := controller.HospitalContollerInit(hospitalService)
 	hospitalModule := NewHospitalModule(hospitalRepository, hospitalContoller, hospitalService)
 	return hospitalModule
@@ -33,7 +34,8 @@ func PatientModuleInit() *PatientModule {
 	gormDB := utils.InitDbClient()
 	baseRepository := repository.BaseRepositoryInit(gormDB)
 	patientRepository := repository.PatientRepositoryInit(baseRepository)
-	patientService := service.PatientServiceInit(patientRepository)
+	baseService := service.BaseServiceInit(baseRepository)
+	patientService := service.PatientServiceInit(baseService, patientRepository)
 	patientContoller := controller.PatientContollerInit(patientService)
 	patientModule := NewPatientModule(patientRepository, patientContoller, patientService)
 	return patientModule
@@ -45,8 +47,9 @@ func StaffModuleInit() *StaffModule {
 	gormDB := utils.InitDbClient()
 	baseRepository := repository.BaseRepositoryInit(gormDB)
 	staffRepository := repository.StaffRepositoryInit(baseRepository)
+	baseService := service.BaseServiceInit(baseRepository)
 	jwtServiceInterface := pkg.JWTServiceInit()
-	staffService := service.StaffServiceInit(staffRepository, jwtServiceInterface)
+	staffService := service.StaffServiceInit(baseService, staffRepository, jwtServiceInterface)
 	staffContoller := controller.StaffContollerInit(staffService)
 	staffModule := NewStaffModule(staffRepository, staffContoller, staffService)
 	return staffModule

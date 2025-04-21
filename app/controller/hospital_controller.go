@@ -1,43 +1,45 @@
 package controller
 
 import (
-	"agnos-assignment/app/response"
 	"agnos-assignment/app/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 type HospitalContollerInterface interface {
+	Create(c *gin.Context)
 	GetList(c *gin.Context)
+	GetDetail(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
 }
 
 type HospitalContoller struct {
-	svc service.HospitalServiceInterface
+	*BaseController[service.HospitalServiceInterface]
 }
 
-func HospitalContollerInit(HospitalService service.HospitalServiceInterface) *HospitalContoller {
+func HospitalContollerInit(hospitalService service.HospitalServiceInterface) *HospitalContoller {
 	return &HospitalContoller{
-		svc: HospitalService,
+		BaseController: BaseControllerInit[service.HospitalServiceInterface](hospitalService),
 	}
 }
 
-// @Summary Get List Hospital
-// @Schemes
-// @Description Search Hospital
-// @Tags Hospital
-//
-// @Param   page         query     int        false  "int valid"
-// @Param   pageSize         query     int        false  "int valid"
-// @Param   sortField         query     string        false  "string valid"
-// @Param   sortValue         query     string        false  "string valid"
-//
-//	@Success		200	{object}	response.HospitalModel
-//
-// @Security Bearer
-//
-// @Router /hospital [get]
+func (h HospitalContoller) Create(c *gin.Context) {
+	h.Svc.Create(c)
+}
+
 func (h HospitalContoller) GetList(c *gin.Context) {
-	query := CreatePagination(c)
-	hospital := response.HospitalModel{}
-	h.svc.GetPaginationHospital(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, hospital)
+	h.BasePagination(c)
+}
+
+func (h HospitalContoller) GetDetail(c *gin.Context) {
+	h.Svc.GetDetail(c)
+}
+
+func (h HospitalContoller) Update(c *gin.Context) {
+	h.Svc.Update(c)
+}
+
+func (h HospitalContoller) Delete(c *gin.Context) {
+	h.Svc.Delete(c)
 }

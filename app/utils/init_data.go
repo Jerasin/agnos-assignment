@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -157,7 +158,7 @@ func (i InitDataClient) InitPatient() []model.Patient {
 	}
 
 	var permissionInfoList []model.Patient
-	fmt.Printf("permissionInfoList = %v Type = %T \n", permissionInfoList, permissionInfoList)
+	logrus.Infof("permissionInfoList = %v Type = %T \n", permissionInfoList, permissionInfoList)
 
 	err = i.db.Find(&permissionInfoList).Error
 	if err != nil {
@@ -172,7 +173,7 @@ func (i InitDataClient) InitPatient() []model.Patient {
 			panic("Find Error")
 		}
 
-		fmt.Printf("newPatientList = %v", newPatientList)
+		logrus.Infof("newPatientList = %v", newPatientList)
 
 		return newPatientList
 	} else {
@@ -232,7 +233,7 @@ func (i InitDataClient) InitHospital() []model.Hospital {
 	}
 
 	var hospitalList []model.Hospital
-	fmt.Printf("permissionInfoList = %v Type = %T \n", hospitalList, hospitalList)
+	logrus.Infof("permissionInfoList = %v Type = %T \n", hospitalList, hospitalList)
 
 	err = i.db.Find(&hospitalList).Error
 	if err != nil {
@@ -247,7 +248,7 @@ func (i InitDataClient) InitHospital() []model.Hospital {
 			panic("Find Error")
 		}
 
-		fmt.Printf("newPatientList = %v", newHospitalList)
+		logrus.Infof("newPatientList = %v", newHospitalList)
 
 		return newHospitalList
 	} else {

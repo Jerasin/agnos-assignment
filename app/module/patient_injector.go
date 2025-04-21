@@ -44,6 +44,6 @@ func NewPatientModule(
 }
 
 func PatientModuleInit() *PatientModule {
-	wire.Build(NewPatientModule, patientCtrlSet, patientSvcSet, patientRepoSet, db, baseRepoSet)
+	wire.Build(NewPatientModule, patientCtrlSet, patientSvcSet, patientRepoSet, db, baseRepoSet, baseSvc)
 	return nil
 }

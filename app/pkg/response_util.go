@@ -52,15 +52,16 @@ func BuildResponse_[T any](status string, message string, data T) dto.ApiRespons
 	}
 }
 
-func BuildPaginationResponse[T any](responseStatus constant.ResponseStatus, data T, totalPage int64, page int, pageSize int) dto.ApiPaginationResponse[T] {
-	return BuildPaginationResponse_(responseStatus.GetResponseStatus(), responseStatus.GetResponseMessage(), data, totalPage, page, pageSize)
+func BuildPaginationResponse[T any](responseStatus constant.ResponseStatus, data T, total int64, totalPage int64, page int, pageSize int) dto.ApiPaginationResponse[T] {
+	return BuildPaginationResponse_(responseStatus.GetResponseStatus(), responseStatus.GetResponseMessage(), data, total, totalPage, page, pageSize)
 }
 
-func BuildPaginationResponse_[T any](status string, message string, data T, totalPage int64, page int, pageSize int) dto.ApiPaginationResponse[T] {
+func BuildPaginationResponse_[T any](status string, message string, data T, total int64, totalPage int64, page int, pageSize int) dto.ApiPaginationResponse[T] {
 	return dto.ApiPaginationResponse[T]{
 		ResponseKey:     status,
 		ResponseMessage: message,
 		Data:            data,
+		Total:           total,
 		TotalPage:       totalPage,
 		Page:            page,
 		PageSize:        pageSize,

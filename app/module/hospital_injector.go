@@ -44,6 +44,6 @@ func NewHospitalModule(
 }
 
 func HospitalModuleInit() *HospitalModule {
-	wire.Build(NewHospitalModule, hospitalCtrlSet, hospitalSvcSet, hospitalRepoSet, db, baseRepoSet)
+	wire.Build(NewHospitalModule, hospitalCtrlSet, hospitalSvcSet, hospitalRepoSet, db, baseRepoSet, baseSvc)
 	return nil
 }

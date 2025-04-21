@@ -19,21 +19,24 @@ import (
 type StaffServiceInterface interface {
 	CreateStaff(c *gin.Context)
 	LoginStaff(c *gin.Context)
+	GetList(c *gin.Context)
 }
 
 type StaffService struct {
+	BaseSvc         BaseServiceInterface
 	StaffRepository repository.StaffRepositoryInterface
 	JWTService      pkg.JWTServiceInterface
 }
 
-func StaffServiceInit(staffRepository repository.StaffRepositoryInterface, jwtService pkg.JWTServiceInterface) *StaffService {
+func StaffServiceInit(baseSvc BaseServiceInterface, staffRepository repository.StaffRepositoryInterface, jwtService pkg.JWTServiceInterface) *StaffService {
 	return &StaffService{
+		BaseSvc:         baseSvc,
 		StaffRepository: staffRepository,
 		JWTService:      jwtService,
 	}
 }
 
-func (s StaffService) CreateStaff(c *gin.Context) {
+func (s *StaffService) CreateStaff(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
 	s.StaffRepository.GetBaseRepo().ClientDb().Transaction(func(tx *gorm.DB) error {
@@ -76,7 +79,7 @@ func (s StaffService) CreateStaff(c *gin.Context) {
 
 		err = s.StaffRepository.GetBaseRepo().Save(tx, &staff)
 		if err != nil {
-			pkg.PanicDatabaseException(err, c)
+			pkg.PanicDatabaseException(err, c, nil)
 		}
 
 		return nil
@@ -85,7 +88,7 @@ func (s StaffService) CreateStaff(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
 }
 
-func (s StaffService) LoginStaff(c *gin.Context) {
+func (s *StaffService) LoginStaff(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
 	var err error
@@ -121,4 +124,11 @@ func (s StaffService) LoginStaff(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, response))
+}
+
+func (s *StaffService) GetList(c *gin.Context) {
+	hospitals := []model.Patient{}
+	hospital := model.Patient{}
+	res := []response.PatientSearchModel{}
+	s.BaseSvc.Pagination(c, hospital, hospitals, res)
 }

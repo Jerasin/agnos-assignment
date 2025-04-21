@@ -18,8 +18,8 @@ type PaginationModel struct {
 	Search    string
 	SortField string
 	SortValue string
-	Field     map[string]interface{}
-	Dest      interface{}
+	Field     map[string]any
+	Dest      any
 }
 
 func getField(field map[string]interface{}) string {
@@ -45,6 +45,9 @@ type BaseRepositoryInterface interface {
 	Pagination(p PaginationModel, query interface{}, args ...interface{}) (result interface{}, Error error)
 	TotalPage(model interface{}, pageSize int) (int64, error)
 	Save(tx *gorm.DB, model interface{}) error
+	Updates(tx *gorm.DB, model any, values any) error
+	Delete(tx *gorm.DB, model any, body any) error
+	Count(model any, conditions *map[string]any) (int64, error)
 }
 
 type BaseRepository struct {
@@ -89,12 +92,8 @@ func (b BaseRepository) Pagination(p PaginationModel, query interface{}, args ..
 	order := fmt.Sprintf("%s %s", p.SortField, strings.ToUpper(p.SortValue))
 	fields := getField(p.Field)
 	var db *gorm.DB
+	db = b.db
 
-	// if fields == "" {
-	// 	db = b.db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
-	// } else {
-	// 	db = b.db.Select(fields).Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
-	// }
 	if fields != "" {
 		db = b.db.Select(fields)
 	}
@@ -103,7 +102,7 @@ func (b BaseRepository) Pagination(p PaginationModel, query interface{}, args ..
 		db = b.db.Where(query, args...)
 	}
 
-	db = db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
+	db = db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(p.Dest)
 
 	if db.Error != nil {
 		log.Error("Got an error finding all couples. Error: ", err)
@@ -138,4 +137,49 @@ func (b BaseRepository) Save(tx *gorm.DB, model interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func (b BaseRepository) Updates(tx *gorm.DB, model any, values any) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
+
+	err := db.Model(model).Updates(values).Error
+
+	if err != nil {
+		log.Error("Got an error when save Error: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func (b BaseRepository) Delete(tx *gorm.DB, model any, body any) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
+
+	err := db.Model(model).Delete(body).Error
+
+	if err != nil {
+		log.Error("Got an error when save Error: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func (b BaseRepository) Count(model any, conditions *map[string]any) (int64, error) {
+	var count int64
+	err := b.db.Model(model).Count(&count).Error
+	if err != nil {
+		log.Error("Got an error when delete user. Error: ", err)
+		return count, err
+	}
+
+	return count, err
 }

@@ -12,43 +12,19 @@ type StaffContollerInterface interface {
 }
 
 type StaffContoller struct {
-	svc service.StaffServiceInterface
+	*BaseController[service.StaffServiceInterface]
 }
 
 func StaffContollerInit(StaffService service.StaffServiceInterface) *StaffContoller {
 	return &StaffContoller{
-		svc: StaffService,
+		BaseController: BaseControllerInit[service.StaffServiceInterface](StaffService),
 	}
 }
 
-// @Summary Create Staff
-// @Schemes
-// @Description Create Staff
-// @Tags Staff
-//
-// @Param request body request.StaffRequest true "query params"
-//
-//	@Success		200	{object}	response.CreateDataResponse
-//
-// @Security Bearer
-//
-// @Router /staff [post]
 func (s StaffContoller) CreateStaff(c *gin.Context) {
-	s.svc.CreateStaff(c)
+	s.Svc.CreateStaff(c)
 }
 
-// @Summary Login Staff
-// @Schemes
-// @Description Login Staff
-// @Tags Staff
-//
-// @Param request body request.StaffLoginRequest true "query params"
-//
-//	@Success		200	{object}	response.LoginStaffModel
-//
-// @Security Bearer
-//
-// @Router /staff/login [post]
 func (s StaffContoller) LoginStaff(c *gin.Context) {
-	s.svc.LoginStaff(c)
+	s.Svc.LoginStaff(c)
 }
