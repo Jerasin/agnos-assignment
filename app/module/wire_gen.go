@@ -9,6 +9,7 @@ package module
 import (
 	"agnos-assignment/app/controller"
 	"agnos-assignment/app/pkg"
+	"agnos-assignment/app/pkg/chat"
 	"agnos-assignment/app/repository"
 	"agnos-assignment/app/service"
 	"agnos-assignment/app/utils"
@@ -53,6 +54,16 @@ func StaffModuleInit() *StaffModule {
 	staffContoller := controller.StaffContollerInit(staffService)
 	staffModule := NewStaffModule(staffRepository, staffContoller, staffService)
 	return staffModule
+}
+
+// Injectors from websocket_injector.go:
+
+func WebsocketModuleInit() *WebsocketModule {
+	chatHub := chat.NewHub()
+	webSocketService := service.WebsocketServiceInit(chatHub)
+	websocketController := controller.WebsocketControllerInit(webSocketService)
+	websocketModule := NewWebsocketModule(websocketController, webSocketService)
+	return websocketModule
 }
 
 // hospital_injector.go:
@@ -130,5 +141,28 @@ func NewStaffModule(
 		StaffRepo: staffRepo,
 		StaffCtrl: staffCtrl,
 		StaffSvc:  staffSvc,
+	}
+}
+
+// websocket_injector.go:
+
+var hub = wire.NewSet(chat.NewHub)
+
+var websocketCtrlSet = wire.NewSet(controller.WebsocketControllerInit, wire.Bind(new(controller.WebsocketControllerInterface), new(*controller.WebsocketController)))
+
+var websocketSvcSet = wire.NewSet(service.WebsocketServiceInit, wire.Bind(new(service.WebsocketServiceInterface), new(*service.WebSocketService)))
+
+type WebsocketModule struct {
+	WebsocketCtrl controller.WebsocketControllerInterface
+	WebsocketSvc  service.WebsocketServiceInterface
+}
+
+func NewWebsocketModule(
+	websocketCtrl controller.WebsocketControllerInterface,
+	websocketSvc service.WebsocketServiceInterface,
+) *WebsocketModule {
+	return &WebsocketModule{
+		WebsocketCtrl: websocketCtrl,
+		WebsocketSvc:  websocketSvc,
 	}
 }
